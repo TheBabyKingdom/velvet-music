@@ -31,17 +31,22 @@ async function checksInRenderer() {
   const bypass=await render({tones:{bass:12},gain:2,bypass:true},{frequency:70});
   const mono=await render({mono:true},{antiPhase:true});
   const stereo=await render({},{antiPhase:true});
-  const compressed=await render({compression:{enabled:true,threshold:-30,ratio:10}},{amplitude:.6});
+  const compression={enabled:true,threshold:-30,ratio:10};
+  const uncompressedLoud=await render({},{amplitude:.6});
+  const uncompressedQuiet=await render({},{amplitude:.06});
+  const compressed=await render({compression},{amplitude:.6});
+  const compressedQuiet=await render({compression},{amplitude:.06});
   const loud=await render({gain:2},{amplitude:.9});
   const limited=await render({gain:2,limiter:true},{amplitude:.9});
   const reverb=await render({reverb:{enabled:true,wet:.8,decay:.5,preDelay:0}},{amplitude:.5,impulse:true});
   const dry=await render({},{amplitude:.5,impulse:true});
   const smooth=await render({},{transition:true});
-  return{flat,gain,eq,graphic,toneFlat,tone,bypass,mono,stereo,compressed,loud,limited,reverb,dry,smooth};
+  return{flat,gain,eq,graphic,toneFlat,tone,bypass,mono,stereo,uncompressedLoud,uncompressedQuiet,compressed,compressedQuiet,loud,limited,reverb,dry,smooth};
 }
 exports.run=async function run(windowOrOptions){
   const window=windowOrOptions.window||windowOrOptions;
   const result=await window.webContents.executeJavaScript(`(${checksInRenderer.toString()})()`);
+  console.log('AUDIO_OFFLINE_METRICS',JSON.stringify(result));
   try {
   for(const [name,metric]of Object.entries(result))assert.ok(metric.finite,`${name} must contain only finite audio samples`);
   assert.ok(result.gain.rms/result.flat.rms>1.98&&result.gain.rms/result.flat.rms<2.02,'gain must double actual amplitude');
@@ -51,7 +56,14 @@ exports.run=async function run(windowOrOptions){
   assert.ok(Math.abs(result.bypass.rms/result.toneFlat.rms-1)<.02,'A/B bypass must restore flat response');
   assert.ok(result.mono.peak<1e-5,'mono must cancel anti-phase stereo');
   assert.ok(result.stereo.rms>.1,'stereo baseline must retain anti-phase signal');
-  assert.ok(result.compressed.rms<.15,'compression must lower sustained loud signals');
+  // Makeup gain depends on compressor parameters, not input level. Comparing
+  // two levels cancels that gain and tests the actual dynamics reduction.
+  // https://www.w3.org/TR/webaudio-1.1/#computing-the-makeup-gain
+  const inputRange=result.uncompressedLoud.rms/result.uncompressedQuiet.rms;
+  const compressedRange=result.compressed.rms/result.compressedQuiet.rms;
+  assert.ok(inputRange>9.8&&inputRange<10.2,'uncompressed reference must retain the 10:1 amplitude ratio');
+  assert.ok(compressedRange<inputRange*.65,'compression must substantially reduce the measured loud/quiet amplitude ratio');
+  assert.ok(result.compressed.rms<result.uncompressedLoud.rms,'compression must attenuate this above-threshold loud signal relative to its own baseline');
   assert.ok(result.loud.peak>1.7,'unlimited 200% gain must expose above-full-scale peaks');
   assert.ok(result.limited.fullPeak<1.001,'default limiter must keep every boosted sample, including attack, below full scale');
   assert.ok(result.reverb.tail>result.dry.tail+1e-7,'convolution must create a real decay tail');

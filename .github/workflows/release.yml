@@ -39,6 +39,17 @@ jobs:
         run: pnpm run test:backend
       - name: Desktop integration checks
         run: pnpm run test:desktop
+      - name: Preserve desktop verification reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Velvet-desktop-checks
+          path: |
+            work/desktop-smoke-result.json
+            work/screenshots/*.png
+            work/desktop-failure.png
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Package runnable Windows ZIP
         run: pnpm run dist:zip
       - name: Package optional single-file portable EXE

@@ -70,15 +70,19 @@ test('real OfflineAudioContext verifies gain, tone, EQ, bypass, mono, reverb and
         for(let i=6000;i<18000;i++)tail+=data[i]*data[i];
         return{peak,rms:Math.sqrt(squares/16000),tail};
       }
-      const flat=await render(),gain=await render({gain:2}),eq=await render({eq:[{frequency:1000,gain:6,q:1}]}),toneFlat=await render({},70),tone=await render({tones:{bass:6}},70),bypass=await render({tones:{bass:12},gain:2,bypass:true},70),mono=await render({mono:true},1000,.2,true),compressed=await render({compression:{enabled:true,threshold:-30,ratio:10}},1000,.6),loud=await render({gain:2},1000,.9),limited=await render({gain:2,limiter:true},1000,.9),reverb=await render({reverb:{enabled:true,wet:.8,decay:.5,preDelay:0}},1000,.5,false,true),dry=await render({},1000,.5,false,true);
-      return{flat,gain,eq,toneFlat,tone,bypass,mono,compressed,loud,limited,reverb,dry};
+      const flat=await render(),gain=await render({gain:2}),eq=await render({eq:[{frequency:1000,gain:6,q:1}]}),toneFlat=await render({},70),tone=await render({tones:{bass:6}},70),bypass=await render({tones:{bass:12},gain:2,bypass:true},70),mono=await render({mono:true},1000,.2,true),uncompressedLoud=await render({},1000,.6),uncompressedQuiet=await render({},1000,.06),compressed=await render({compression:{enabled:true,threshold:-30,ratio:10}},1000,.6),compressedQuiet=await render({compression:{enabled:true,threshold:-30,ratio:10}},1000,.06),loud=await render({gain:2},1000,.9),limited=await render({gain:2,limiter:true},1000,.9),reverb=await render({reverb:{enabled:true,wet:.8,decay:.5,preDelay:0}},1000,.5,false,true),dry=await render({},1000,.5,false,true);
+      return{flat,gain,eq,toneFlat,tone,bypass,mono,uncompressedLoud,uncompressedQuiet,compressed,compressedQuiet,loud,limited,reverb,dry};
     },{module});
     assert.ok(result.gain.rms/result.flat.rms>1.98&&result.gain.rms/result.flat.rms<2.02,'gain must double amplitude');
     assert.ok(result.eq.rms/result.flat.rms>1.9,'parametric EQ must boost actual audio');
     assert.ok(result.tone.rms/result.toneFlat.rms>1.7,'bass shelf must boost actual low frequencies');
     assert.ok(Math.abs(result.bypass.rms/result.toneFlat.rms-1)<.02,'A/B bypass must restore flat response');
     assert.ok(result.mono.peak<1e-5,'mono must cancel anti-phase stereo');
-    assert.ok(result.compressed.rms<.15,'compression must lower sustained loud signals');
+    const inputRange=result.uncompressedLoud.rms/result.uncompressedQuiet.rms;
+    const compressedRange=result.compressed.rms/result.compressedQuiet.rms;
+    assert.ok(inputRange>9.8&&inputRange<10.2,'uncompressed baseline must retain the 10:1 amplitude ratio');
+    assert.ok(compressedRange<inputRange*.65,'compression must reduce measured loud/quiet dynamic range despite automatic makeup gain');
+    assert.ok(result.compressed.rms<result.uncompressedLoud.rms,'compression must attenuate this above-threshold loud signal relative to its own baseline');
     assert.ok(result.loud.peak>1.7,'unlimited 200% gain should expose above-full-scale peaks');
     assert.ok(result.limited.peak<1.001,'enabled limiter must keep these boosted samples below full scale');
     assert.ok(result.reverb.tail>result.dry.tail+1e-7,'convolution must create a real decay tail');
