@@ -39,3 +39,7 @@ Effects run on the audio the app can actually access. A limiter can reduce boost
 Bundled demo music is originally generated instrumental material for testing the player. Discovery-song suggestions contain only descriptive metadata and service search links; they are not supplied recordings.
 
 The Windows build and supplied automated checks are the supported delivery target. Release documentation must report any checks that could not be completed; no test suite proves every audio device, codec or remote provider works.
+
+## Added in 1.1
+
+Live Audius full-track search and in-app playback, seeking, artwork, real audio processing and persistent streaming references are implemented. Public Audius songs can share queues and playlists with local files. Other service accounts and their complete catalogues remain unconnected; saved references search for playable alternatives inside Velvet. Streaming requires an internet connection and provider availability.

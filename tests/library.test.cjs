@@ -117,7 +117,7 @@ test('M3U import reports missing tracks and resolves local relative paths withou
 });
 
 test('newer schema is rejected, hostile settings keys are stripped, invalid queue entries removed', () => {
-  assert.throws(()=>normalizeState({schemaVersion:2}),/newer/);
+  assert.throws(()=>normalizeState({schemaVersion:999}),/newer/);
   const input=JSON.parse('{"settings":{"__proto__":{"polluted":true},"theme":"dark","constructor":"x"},"queue":["unknown"]}');
   const state=normalizeState(input);
   assert.equal({}.polluted,undefined);

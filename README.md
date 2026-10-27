@@ -2,93 +2,51 @@
 
 **Your music, your atmosphere.**
 
-An independent Windows desktop music player with a carefully designed interface, expressive themes, a local library and a real audio effects engine.
+A Windows desktop music player with live song search, full-length streaming inside the app, a local library, expressive themes and a real audio effects engine.
 
-Velvet is a local player first. Spotify, YouTube Music and SoundCloud are labelled service references and official search links; this release does not provide account-connected streaming. Read [provider capabilities](docs/PROVIDERS.md) and the [feature status](docs/FEATURES.md) for the working features and remaining limitations.
+## Downloads
 
-## Download and use
+- [Velvet 1.0](https://github.com/TheBabyKingdom/velvet-music/releases/tag/v1.0.0): local music, themes, playlists and the audio suite.
+- [Velvet 1.1](https://github.com/TheBabyKingdom/velvet-music/releases/tag/v1.1.0): adds live song search and in-app full-song playback from Audius.
 
-[Download Velvet for Windows](https://github.com/TheBabyKingdom/velvet-music/releases/tag/v1.0.0) · [Successful Windows checks](https://github.com/TheBabyKingdom/velvet-music/actions/runs/40504471427)
+Download the Windows ZIP, extract **every file**, then open **Velvet.exe**. No Node.js, terminal or administrator access is needed to run the packaged app. The build is unsigned; compare the download with its release checksum.
 
-The Windows download is **Velvet-1.0.0-Windows-x64.zip**, for 64-bit Windows 10/11. Extract **all** its contents into a folder, then open **Velvet.exe**. Keep the executable beside its included runtime files and resources. You do not need Node.js, a terminal, or administrator access.
+## Search and play
 
-Try the three original Velvet Sessions instrumentals, then choose **Add music** to import files or a music folder. Open **Appearance** to change themes, colours and layout, or choose your own image, animated GIF or video wallpaper. GIFs retain their animation; video wallpapers loop silently.
+Type a song or artist in the search box and press Enter. Playable public tracks from Audius appear with a **Play** button. They play in Velvet with the same pause, seek, volume, queue, favourites, playlists and audio controls as local songs. Nothing opens in a browser when you press Play.
 
-The executable is unsigned. Windows may identify it as an unrecognised app; check the source and supplied checksum before deciding whether to run it. Signing a future release requires the maintainer's signing certificate.
+The available catalogue belongs to Audius. It does not contain every recording released on other services. Gated, private and subscription-only tracks are excluded. A saved Spotify, YouTube or SoundCloud reference searches for matching playable versions inside Velvet; choose the recording you want rather than receiving an automatic substitution. Those service accounts are not connected.
 
-Your imported music stays in its original location. Keep those files accessible after importing. Library, playlists, queue, preferences and history are stored in your Windows app-data folder, normally %APPDATA%\Velvet. Back up that folder and your original music separately.
+The app sends searches and streaming requests to Audius when used. Its Discover page loads public trending tracks and artwork. Your local library and preferences stay on your computer. Streaming needs an internet connection; local files remain usable offline.
 
-## What you can do
+## Make it yours
 
-- Import local music with a preview, duplicate detection and metadata; create playlists and restore a queue between sessions.
-- Shape local audio with tone controls, a 10-band parametric or 31-band graphic EQ, stereo controls, reverb, compression and a protective limiter.
-- Change themes, colours, layout, fonts and your own image, GIF or video background.
-- Explore 44 curated song suggestions by mood, genre, energy and decade; look them up on your preferred listening service.
-- Search recording metadata through MusicBrainz when online, then choose a service to find a recording. Metadata results contain no audio.
-- Export playlists as JSON, CSV or M3U/M3U8, and move your Velvet preferences with a settings export and confirmation preview.
+Upload an image, animated GIF or looping video in **Appearance**. Adjust background blur and dimming, colours, fonts, corner radius, spacing and sidebar width. Themes and layout persist between sessions.
 
-Playlist edits are local. Service account synchronisation, provider audio downloads and protected-audio processing are not implemented. The feature matrix lists the remaining larger-brief work explicitly.
+Import local files or folders with a preview and duplicate detection. Create standard or smart playlists, keep a mixed local/streaming queue, export playlists, use the sleep timer, and control listening-history collection and retention. Imported files remain in their original location.
 
-## Run the source
+**Audio Lab** processes actual accessible audio with tone controls, 10-band parametric or 31-band graphic EQ, reverb, compression, balance, mono, stereo width and gain up to 200%. A protective limiter is enabled by default. Boosted gain can distort audio and increase hearing risk; limiting does not make high listening levels safe.
 
-Use Node.js 24 and pnpm 11.25.0. From the source folder:
+## Run or build the source
 
-    pnpm install --frozen-lockfile
-    pnpm start
+Use Node.js 24 and pnpm 11:
 
-Installation runs the included prepare script to generate the bundled icon, artwork and three original 48-second demo compositions. These assets need no separate download. The source archive may already include them; a fresh Git checkout can recreate them.
+```sh
+pnpm install --frozen-lockfile
+pnpm start
+pnpm test
+pnpm run test:backend
+pnpm run test:desktop
+pnpm run dist:zip
+```
 
-Dependencies download at installation time; local playback works offline afterwards. The lockfile is included. Electron supplies the native window and file bridge; the interface uses HTML/CSS/JavaScript, and local sound is processed with Web Audio. No hosted backend is required.
-
-## Check and build
-
-On a Windows desktop:
-
-    pnpm test
-    pnpm run test:backend
-    pnpm run test:desktop
-    pnpm run dist
-
-The desktop test uses a separate test library. The default dist command builds a runnable Windows ZIP in release/. To build an optional single-file portable executable on a machine that can run the NSIS compiler:
-
-    pnpm run dist:portable
-
-To create just the application folder:
-
-    pnpm run pack
-
-The delivered Windows package is a ZIP. A local single-file EXE build was not completed because the build host could not launch the NSIS compiler. This does not affect the ZIP's included Velvet.exe. macOS and Linux require their own validation and are not supplied as tested binaries.
-
-Regenerate the bundled assets independently with:
-
-    node scripts/generate-assets.mjs
-
-## Verification status
-
-The Windows build passed all 16 native desktop checks, including actual playback and audio rendering, saved settings, playlists, queue restoration, image/GIF/video backgrounds and a live MusicBrainz search. Unit and backend checks also passed. See [validation details](docs/VALIDATION.md) for the exact scope. Physical listening across devices remains untested.
-
-## GitHub and release builds
-
-The project repository is [TheBabyKingdom/velvet-music](https://github.com/TheBabyKingdom/velvet-music), created as a private repository. Your account must have access to view it. The delivery message identifies the source and downloads actually published.
-
-The included Windows build workflow installs the locked dependencies, regenerates assets, runs the unit, backend and desktop checks, and builds a Windows ZIP with a SHA-256 checksum. A manual Actions run produces a downloadable build artifact; its optional input also builds a single-file portable EXE. Pushing a version tag such as v1.0.0 publishes the ZIP and checksum to a GitHub Release after checks succeed. The tagged-release step needs repository Contents write permission.
-
-A workflow or source checkout is not itself a completed release. Use the supplied ZIP or a successful workflow artifact to run the app without developer tools.
-
-## Configuration and privacy
-
-No API keys are required for local playback, curated suggestions or public MusicBrainz search. MusicBrainz requests identify Velvet and its maintainer's public GitHub profile. Optional environment variables are documented in .env.example; the app does not automatically load .env files. Never put service secrets in the renderer or commit them to GitHub.
-
-Velvet has no advertisements or telemetry of its own. MusicBrainz receives a catalogue query when you explicitly search; opening a listening service uses that service and its privacy/account rules. Local listening history is controlled in Settings. Universal ad blocking or ad-free service playback is not promised.
-
-Gain above 100% increases the signal level and can distort audio. The limiter reduces peaks; it does not make high listening levels safe. Start at a comfortable volume.
+Installation regenerates the original demo tracks, artwork and icons. The desktop test uses an isolated library and includes live streaming checks. The Windows workflow runs the checks, packages a ZIP and publishes the versioned release after they pass. macOS and Linux builds need separate validation.
 
 ## Documentation
 
-- [Feature status and limitations](docs/FEATURES.md)
-- [Provider capabilities and official references](docs/PROVIDERS.md)
-- [Playlist and settings formats](docs/FORMAT.md)
+- [Feature status](docs/FEATURES.md)
+- [Provider capabilities](docs/PROVIDERS.md)
+- [Playlist formats](docs/FORMAT.md)
+- [Validation](docs/VALIDATION.md)
 
-MIT licensed. Original demo compositions and abstract artwork were created for this project. Your imported music and third-party dependencies retain their own rights and licences.
-
-
+MIT licensed. Bundled original compositions and artwork belong to this project. Your music and third-party dependencies retain their own rights and licences. No provider passwords or API keys are required for public Audius search and playback.

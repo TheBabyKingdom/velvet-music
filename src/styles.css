@@ -6,3 +6,4 @@
 @media(max-width:1090px){:root{--sidebar:185px;--space:22px}.queue-panel{display:none}.player-tools{min-width:200px}.topbar{padding-left:22px}.hero-art{right:5px}.hero h1{font-size:46px}.sidebar{padding-left:12px;padding-right:12px}.two-col{grid-template-columns:1fr}.player-tools #sleep-icon{display:none}.topbar .history-buttons{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--art-size)),1fr))}.music-card .cover{max-height:300px}.playlist-folder-label{font-size:9px;letter-spacing:1px;color:var(--muted);margin:12px 12px 5px}.settings-row input[type=text]{max-width:180px}
+.streaming-notice{display:flex;gap:12px;align-items:center}.streaming-notice svg{color:var(--accent);min-width:18px}.source-badge.audius{color:var(--accent)}

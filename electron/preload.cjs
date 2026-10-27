@@ -9,6 +9,8 @@ const subscribe = channel => callback => {
 contextBridge.exposeInMainWorld('velvet', {
   readState: invoke('readState'),
   searchCatalog: invoke('searchCatalog'),
+  searchSongs: invoke('searchSongs'),
+  trendingSongs: invoke('trendingSongs'),
   saveState: invoke('saveState'),
   chooseFiles: invoke('chooseFiles'),
   chooseFolder: invoke('chooseFolder'),

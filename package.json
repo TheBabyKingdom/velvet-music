@@ -1,6 +1,6 @@
 {
   "name": "velvet-music",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Your music, your atmosphere. A local-first desktop player with real audio effects and expressive customisation.",
   "type": "module",
   "main": "electron/main.cjs",

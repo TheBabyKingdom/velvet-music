@@ -1,5 +1,6 @@
 /** Capabilities describe this release. Provider references are not downloaded audio. */
 export const PROVIDERS = Object.freeze({
+  audius:{id:'audius',name:'Audius',color:'#bf9aff',status:'Working',description:'Search full-length public songs and play them directly in Velvet. Save favourites, add songs to playlists and keep a mixed local/streaming queue.',playback:'Working · inside Velvet',search:'Working · live catalogue',imports:'Working · saved streaming references',effects:'Working · public unprotected streams',requirements:'Internet connection. No key is required for public read-only access. Availability depends on the catalogue; gated and subscription-only recordings are excluded.',capabilities:{playback:true,librarySearch:true,catalogSearch:true,referenceImport:true,audioImport:false,effects:true,analysis:true,sync:false}},
   local: {
     id: 'local', name: 'Local files', color: '#c5f277', status: 'Working',
     description: 'Play files you own through Velvet’s audio engine. Your library stays on this computer.',
@@ -9,24 +10,24 @@ export const PROVIDERS = Object.freeze({
   },
   spotify: {
     id: 'spotify', name: 'Spotify', color: '#1ed760', status: 'Working · links only',
-    description: 'Save track, album and playlist links; open Spotify or its website search. These are references, not downloaded songs.',
-    playback: 'Planned · authenticated streaming', search: 'Working · opens Spotify search', imports: 'Working · service references', effects: 'Unavailable for this provider',
+    description: 'Save Spotify references. Playable versions can be searched inside Velvet. Spotify account streaming is not connected.',
+    playback: 'Planned · authenticated streaming', search: 'Planned · connected catalogue', imports: 'Working · service references', effects: 'Unavailable for this provider',
     requirements: 'Spotify determines availability. Full SDK playback needs OAuth, an approved app and Spotify Premium; it is not connected in this release.',
     capabilities: { playback: false, librarySearch: true, catalogSearch: false, referenceImport: true, audioImport: false, effects: false, analysis: false, sync: false },
     docs: 'https://developer.spotify.com/documentation/web-playback-sdk',
   },
   youtube: {
     id: 'youtube', name: 'YouTube Music', color: '#ff6c76', status: 'Working · links only',
-    description: 'Save YouTube or YouTube Music video and playlist links, then open the official website.',
-    playback: 'Planned · official visible player', search: 'Working · opens YouTube Music search', imports: 'Working · service references', effects: 'Unavailable for this provider',
+    description: 'Save YouTube references and search for playable versions inside Velvet.',
+    playback: 'Planned · official visible player', search: 'Planned · connected catalogue', imports: 'Working · service references', effects: 'Unavailable for this provider',
     requirements: 'Availability, advertisements and account requirements are controlled by YouTube. Catalogue search and in-app streaming are not connected.',
     capabilities: { playback: false, librarySearch: true, catalogSearch: false, referenceImport: true, audioImport: false, effects: false, analysis: false, sync: false },
     docs: 'https://developers.google.com/youtube/iframe_api_reference',
   },
   soundcloud: {
     id: 'soundcloud', name: 'SoundCloud', color: '#ff9955', status: 'Working · links only',
-    description: 'Save public track and playlist references, or open SoundCloud search. No audio is downloaded.',
-    playback: 'Planned · official widget or authorised API', search: 'Working · opens SoundCloud search', imports: 'Working · service references', effects: 'Unavailable for this provider',
+    description: 'Save public track and playlist references. Search for playable versions inside Velvet.',
+    playback: 'Planned · official widget or authorised API', search: 'Planned · connected catalogue', imports: 'Working · service references', effects: 'Unavailable for this provider',
     requirements: 'Authorised API search and streaming require a registered app and OAuth. Creator, subscription or region restrictions can apply.',
     capabilities: { playback: false, librarySearch: true, catalogSearch: false, referenceImport: true, audioImport: false, effects: false, analysis: false, sync: false },
     docs: 'https://developers.soundcloud.com/docs',

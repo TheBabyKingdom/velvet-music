@@ -4,6 +4,8 @@ const fsp = require('node:fs/promises');
 const path = require('node:path');
 const {pathToFileURL} = require('node:url');
 const {Readable} = require('node:stream');
+const {AudiusProvider}=require('./audius.cjs');
+const audius=new AudiusProvider();
 const {StateStore, ImportManager, CatalogSearch, publicState, validExternalURL, parsePlaylist, playlistDocument, safeJson, AUDIO_EXTENSIONS} = require('./library.cjs');
 
 protocol.registerSchemesAsPrivileged([{scheme: 'velvet-media', privileges: {standard: true, secure: true, supportFetchAPI: true, stream: true, corsEnabled: true}}]);
@@ -107,6 +109,8 @@ function attachWatcher(folder) {
 
 function registerIPC() {
   handle('searchCatalog', query => catalog.search(query));
+  handle('searchSongs',query=>audius.search(query));
+  handle('trendingSongs',()=>audius.trending());
   handle('readState', () => ({...publicState(store.state), recoveryMessage: store.recovery, recovery: store.recovery}));
   handle('saveState', async partial => {
     if (!partial || typeof partial !== 'object' || JSON.stringify(partial).length > 80 * 1024 * 1024) throw new Error('Library update is invalid or too large.');
@@ -216,8 +220,10 @@ async function registerMediaProtocol() {
   protocol.handle('velvet-media', async request => {
     try {
       const url = new URL(request.url);
-      if (!['track', 'background'].includes(url.hostname) || url.search || url.hash || !['GET', 'HEAD'].includes(request.method)) return new Response('Invalid media request', {status: 400});
+      if (!['track', 'background', 'stream', 'artwork'].includes(url.hostname) || url.search || url.hash || !['GET', 'HEAD'].includes(request.method)) return new Response('Invalid media request', {status: 400});
       const trackId = decodeURIComponent(url.pathname.slice(1));
+      if(url.hostname==='stream')return await audius.stream(trackId,request);
+      if(url.hostname==='artwork')return await audius.artwork(trackId);
       const track = url.hostname === 'background'
         ? (/^[a-f0-9-]{36}\.(jpg|jpeg|png|webp|gif|mp4|webm|mov)$/.test(trackId) ? {filePath:path.join(app.getPath('userData'), 'backgrounds', trackId)} : null)
         : store.state.tracks.find(value => value.id === trackId && value.source === 'local');

@@ -3,12 +3,13 @@ const fsp = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 const AUDIO_EXTENSIONS = new Set(['.mp3', '.wav', '.flac', '.m4a', '.aac', '.ogg', '.opus', '.webm']);
 const PROVIDER_HOSTS = {
   spotify: ['open.spotify.com'],
   youtube: ['www.youtube.com', 'youtube.com', 'youtu.be', 'music.youtube.com'],
   soundcloud: ['soundcloud.com', 'www.soundcloud.com', 'on.soundcloud.com'],
+  audius: ['audius.co', 'www.audius.co'],
 };
 const cleanText = (value, max = 500) => typeof value === 'string' ? value.slice(0, max).replace(/\u0000/g, '') : '';
 const id = () => crypto.randomUUID();
@@ -47,8 +48,9 @@ function defaultState() {
 
 function normalizeTrack(track, existing, trusted = false) {
   if (!isRecord(track)) return null;
-  const source = ['local', 'spotify', 'youtube', 'soundcloud'].includes(track.source) ? track.source : null;
+  const source = ['local', 'spotify', 'youtube', 'soundcloud', 'audius'].includes(track.source) ? track.source : null;
   if (!source) return null;
+  if(source==='audius' && !/^audius:[A-Za-z0-9_-]{3,60}$/.test(track.id||existing?.id||''))return null;
   if (source === 'local' && !trusted && !existing) return null;
   if (source !== 'local' && !validExternalURL(track.externalUrl, source)) return null;
   const result = {
@@ -66,6 +68,7 @@ function normalizeTrack(track, existing, trusted = false) {
   };
   const artwork = track.artwork ?? existing?.artwork;
   if (typeof artwork === 'string' && artwork.length <= 2500000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(artwork)) result.artwork = artwork;
+  if(source==='audius'){result.providerId=result.id.slice(7);result.playable=true;result.mediaUrl='velvet-media://stream/'+result.providerId;if(artwork==='velvet-media://artwork/'+result.providerId)result.artwork=artwork;}
   if (source === 'local') {
     const origin = trusted ? track : existing;
     if (!origin?.filePath || !path.isAbsolute(origin.filePath)) return null;
@@ -115,6 +118,7 @@ function normalizeState(input, previous = defaultState(), trusted = false) {
 function publicTrack(track) {
   const {filePath, fingerprint, fileSize, modifiedAt, ...result} = track;
   if (track.source === 'local') result.mediaUrl = 'velvet-media://track/' + encodeURIComponent(track.id);
+  if(track.source==='audius')result.mediaUrl='velvet-media://stream/'+encodeURIComponent(track.id.slice(7));
   return result;
 }
 function publicState(state) {
@@ -277,7 +281,7 @@ const csvCell = value => '"' + String(value ?? '').replace(/"/g, '""') + '"';
 function playlistDocument(playlist, tracks, format = 'json') {
   const byId = new Map(tracks.map(track => [track.id, track]));
   const ordered = (playlist.trackIds || []).map(trackId => byId.get(trackId)).filter(Boolean);
-  if (format === 'csv') return ['title,artist,album,source,url,path,duration', ...ordered.map(track => [track.title, track.artist, track.album, track.source, track.externalUrl || '', track.filePath || '', track.duration].map(csvCell).join(','))].join('\r\n');
+  if (format === 'csv') return ['id,title,artist,album,source,url,path,duration', ...ordered.map(track => [track.id, track.title, track.artist, track.album, track.source, track.externalUrl || '', track.filePath || '', track.duration].map(csvCell).join(','))].join('\r\n');
   if (format === 'm3u' || format === 'm3u8') return ['#EXTM3U', '#PLAYLIST:' + playlist.name.replace(/[\r\n]/g, ' '), ...ordered.flatMap(track => ['#EXTINF:' + Math.round(track.duration || -1) + ',' + (track.artist + ' - ' + track.title).replace(/[\r\n]/g, ' '), track.filePath || track.externalUrl])].join('\n');
   return JSON.stringify({format: 'velvet-playlist', version: 1, name: playlist.name, description: playlist.description || '', tracks: ordered.map(track => {const item = publicTrack(track); delete item.mediaUrl; if (track.filePath) item.path = track.filePath; return item;})}, null, 2);
 }
@@ -310,7 +314,7 @@ function parsePlaylist(text, format, libraryTracks, originDirectory = '') {
     let match = libraryTracks.find(track => (row.id && track.id === row.id) || (candidatePath && track.filePath && path.normalize(track.filePath).toLowerCase() === path.normalize(path.resolve(originDirectory, candidatePath)).toLowerCase()) || (url && track.externalUrl === url));
     if (!match && url) {
       const source = Object.keys(PROVIDER_HOSTS).find(provider => validExternalURL(url, provider));
-      if (source) match = normalizeTrack({...row, id: id(), source, externalUrl: url, title: row.title || 'Service reference', artist: row.artist || 'Open in provider'}, null, false);
+      if (source) match = normalizeTrack({...row, id: source==='audius'&&/^audius:[A-Za-z0-9_-]{3,60}$/.test(row.id||'')?row.id:id(), source, externalUrl: url, title: row.title || 'Service reference', artist: row.artist || 'Open in provider'}, null, false);
     }
     if (!match) { missing.push({title: cleanText(row.title || candidatePath || 'Unknown track'), reason: candidatePath ? 'Audio file is not in your library. Import its folder first.' : 'No matching imported track or supported service URL.'}); continue; }
     if (seen.has(match.id)) duplicates.push({title: match.title, reason: 'Repeated playlist entry; order is preserved.'});

@@ -40,3 +40,11 @@ Adapters declare playback, catalogue search, reference import, audio import, eff
 The app’s catalogue search uses MusicBrainz metadata, not provider streaming. The [MusicBrainz API](https://musicbrainz.org/doc/MusicBrainz_API) permits public searches without an API key. Its [rate-limit rules](https://musicbrainz.org/doc/MusicBrainz_API/Rate_Limiting) require at most one request per second and an identifying User-Agent with real contact information. Velvet caches searches and identifies its maintainer as [TheBabyKingdom](https://github.com/TheBabyKingdom). Forks should configure their own real contact.
 
 Search text is sent only when you request a catalogue search. Results can be incomplete or describe alternate releases; choose the desired recording yourself. MusicBrainz supplies no audio. [Core metadata is CC0](https://musicbrainz.org/doc/About/Data_License); supplementary data has separate terms. Commercial public-API use needs the service’s commercial-use review. No MusicBrainz account writes are performed.
+
+## Audius streaming in 1.1
+
+Audius is a working in-app provider. Public search and streaming use its official read-only API without a key. Results must be explicitly streamable and available for public access; private, deleted, unlisted and gated tracks are excluded. Streams stay in the desktop player and support seeking, volume, queueing and the accessible audio pipeline. Provider availability can change; there is no promise that another service's recording is present.
+
+The native bridge handles provider requests. It does not expose arbitrary remote URLs to the renderer. Redirects must use HTTPS and resolve to public network addresses; private/local network targets are rejected. Artwork is bounded and cached. There is no download/export of streamed recordings.
+
+Official API reference: https://docs.audius.co/api/
