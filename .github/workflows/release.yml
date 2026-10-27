@@ -1,0 +1,84 @@
+name: Windows build and release
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_portable:
+        description: Also build a single-file portable EXE
+        type: boolean
+        default: false
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - uses: pnpm/action-setup@v6
+        with:
+          version: '11.25.0'
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Generate bundled artwork and original demo audio
+        run: node scripts/generate-assets.mjs
+      - name: Unit checks
+        run: pnpm test
+      - name: Backend persistence checks
+        run: pnpm run test:backend
+      - name: Desktop integration checks
+        run: pnpm run test:desktop
+      - name: Package runnable Windows ZIP
+        run: pnpm run dist:zip
+      - name: Package optional single-file portable EXE
+        if: github.event_name == 'workflow_dispatch' && inputs.include_portable
+        run: pnpm run dist:portable
+      - name: Create SHA-256 checksums
+        shell: pwsh
+        run: |
+          $buildFiles = @(Get-ChildItem -Path 'release/*.zip','release/*.exe' -File)
+          if (-not ($buildFiles | Where-Object { $_.Extension -eq '.zip' })) { throw 'No runnable Windows ZIP was built.' }
+          $checksumLines = $buildFiles | ForEach-Object {
+            $fileHash = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$fileHash  $($_.Name)"
+          }
+          Set-Content -LiteralPath 'release/SHA256SUMS.txt' -Value $checksumLines -Encoding utf8
+      - name: Upload downloadable build
+        uses: actions/upload-artifact@v7
+        with:
+          name: Velvet-Windows-x64
+          path: |
+            release/*.zip
+            release/*.exe
+            release/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish tagged GitHub Release
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'v1.0.0' }}
+          RELEASE_SHA: ${{ github.sha }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $releasePaths = @(Get-ChildItem -Path 'release/*.zip','release/*.exe' -File | ForEach-Object { $_.FullName })
+          gh release view "$env:RELEASE_TAG" 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload "$env:RELEASE_TAG" @releasePaths 'release/SHA256SUMS.txt' --clobber
+          } else {
+            gh release create "$env:RELEASE_TAG" @releasePaths 'release/SHA256SUMS.txt' --target "$env:RELEASE_SHA" --title "Velvet $env:RELEASE_TAG preview" --prerelease --notes-file docs/release-notes.md
+          }
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub release upload failed.' }
+

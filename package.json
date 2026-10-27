@@ -1,0 +1,91 @@
+{
+  "name": "velvet-music",
+  "version": "1.0.0",
+  "description": "Your music, your atmosphere. A local-first desktop player with real audio effects and expressive customisation.",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "author": "Velvet contributors",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.cjs tests/*.test.mjs",
+    "test:desktop": "electron . --velvet-test",
+    "dist": "node scripts/build-windows.cjs",
+    "pack": "node scripts/build-windows.cjs --dir",
+    "dist:zip": "node scripts/build-windows.cjs --zip",
+    "test:backend": "node tests/backend-smoke.cjs",
+    "prepare": "node scripts/generate-assets.mjs",
+    "dist:portable": "node scripts/build-windows.cjs --portable"
+  },
+  "dependencies": {
+    "music-metadata": "12.2.3"
+  },
+  "build": {
+    "appId": "com.velvet.music",
+    "productName": "Velvet",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "src/**/*",
+      "electron/**/*",
+      "assets/**/*",
+      "package.json",
+      "LICENSE",
+      "docs/PROVIDERS.md"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "signExecutable": false,
+      "artifactName": "Velvet-${version}-Windows-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Velvet-${version}-Windows-x64.exe",
+      "requestExecutionLevel": "user"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.music"
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "AudioVideo"
+    },
+    "npmRebuild": false,
+    "extraFiles": [
+      {
+        "from": "README.md",
+        "to": "README.md"
+      },
+      {
+        "from": "docs",
+        "to": "docs",
+        "filter": [
+          "**/*.md"
+        ]
+      },
+      {
+        "from": ".env.example",
+        "to": "example.env"
+      }
+    ]
+  },
+  "devDependencies": {
+    "electron": "45.0.0",
+    "electron-builder": "26.18.0"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

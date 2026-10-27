@@ -1,0 +1,41 @@
+[
+  {
+    "id": "demo-blue-hour",
+    "title": "Blue Hour",
+    "artist": "Velvet Sessions",
+    "album": "After the noise",
+    "duration": 48,
+    "fileName": "blue-hour.wav",
+    "genre": "ambient",
+    "year": 2026,
+    "source": "local",
+    "addedAt": "2026-10-25T00:00:00Z",
+    "artwork": null
+  },
+  {
+    "id": "demo-glasshouse",
+    "title": "Glasshouse",
+    "artist": "Velvet Sessions",
+    "album": "After the noise",
+    "duration": 48,
+    "fileName": "glasshouse.wav",
+    "genre": "ambient",
+    "year": 2026,
+    "source": "local",
+    "addedAt": "2026-10-25T00:00:00Z",
+    "artwork": null
+  },
+  {
+    "id": "demo-orbit",
+    "title": "Orbit",
+    "artist": "Velvet Sessions",
+    "album": "After the noise",
+    "duration": 48,
+    "fileName": "orbit.wav",
+    "genre": "ambient",
+    "year": 2026,
+    "source": "local",
+    "addedAt": "2026-10-25T00:00:00Z",
+    "artwork": null
+  }
+]
