@@ -13,7 +13,7 @@ This release delivers a usable local-player foundation with real audio processin
 | Dynamics and ambience | Working for local audio | Compressor, generated-impulse reverb and per-effect bypass/order. |
 | Audio analysis | Working for local audio | Real processed-signal spectrum and peak/clipping metering; no fabricated streaming visualisation. |
 | Speed | Working where runtime supports it | Playback speed and preserve-pitch option through the media element. Independent pitch shifting is planned. |
-| Discovery | Working | 44 curated song references with mood/genre/energy/decade filters; ranking can use actual supplied likes/history. No live popularity or AI-recommendation claim. |
+| Discovery | Working | 44 curated song references with mood/genre/energy/decade filters; ranking can use actual supplied likes/history. Rankings use the available track metadata. |
 | Recording search | Working when online | MusicBrainz metadata search with rate limiting, caching and a meaningful User-Agent. It does not stream songs or establish provider availability. |
 | Service links | Working | Spotify tracks/albums/playlists, YouTube/YouTube Music videos/playlists and SoundCloud tracks/sets saved as references and opened in the original service. |
 | Service authentication | Planned / Needs credentials | No Spotify, Google or SoundCloud account connection is implemented; no service credentials are requested or stored. |

@@ -88,8 +88,9 @@ jobs:
           gh release view "$env:RELEASE_TAG" 2>$null
           if ($LASTEXITCODE -eq 0) {
             gh release upload "$env:RELEASE_TAG" @releasePaths 'release/SHA256SUMS.txt' --clobber
+            gh release edit "$env:RELEASE_TAG" --title "Velvet $env:RELEASE_TAG" --prerelease=false --latest --notes-file docs/release-notes.md
           } else {
-            gh release create "$env:RELEASE_TAG" @releasePaths 'release/SHA256SUMS.txt' --target "$env:RELEASE_SHA" --title "Velvet $env:RELEASE_TAG preview" --prerelease --notes-file docs/release-notes.md
+            gh release create "$env:RELEASE_TAG" @releasePaths 'release/SHA256SUMS.txt' --target "$env:RELEASE_SHA" --title "Velvet $env:RELEASE_TAG" --latest --notes-file docs/release-notes.md
           }
           if ($LASTEXITCODE -ne 0) { throw 'GitHub release upload failed.' }
 

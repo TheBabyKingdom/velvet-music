@@ -2,7 +2,7 @@
 
 **Your music, your atmosphere.**
 
-An independent Windows desktop music player with a carefully designed interface, expressive themes, a local library and a real audio effects engine. Inspired by the ease of Spotify and the customisation of Spicetify, with its own design and implementation.
+An independent Windows desktop music player with a carefully designed interface, expressive themes, a local library and a real audio effects engine.
 
 Velvet is a local player first. Spotify, YouTube Music and SoundCloud are labelled service references and official search links; this release does not provide account-connected streaming. Read [provider capabilities](docs/PROVIDERS.md) and the [feature status](docs/FEATURES.md) for the working features and remaining limitations.
 
@@ -92,6 +92,3 @@ Gain above 100% increases the signal level and can distort audio. The limiter re
 MIT licensed. Original demo compositions and abstract artwork were created for this project. Your imported music and third-party dependencies retain their own rights and licences.
 
 
-## Design reference
-
-The brief also referenced [Riff](https://github.com/rootscripts/riff). Velvet takes inspiration from its emphasis on personalisation and an audio workspace; Velvet's implementation, abstract artwork, icons and demo compositions were created for this project.
