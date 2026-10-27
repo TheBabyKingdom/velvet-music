@@ -14,5 +14,5 @@ Spotify, YouTube Music and SoundCloud links are references opened in the origina
 Download the Windows x64 ZIP, extract every file, and open Velvet.exe. Compare the ZIP with SHA256SUMS.txt. This preview build is unsigned and has no automatic updater. Your imported music stays in its existing folder; app preferences and library records are stored locally.
 
 
-Automated checks pass for the core data and control logic. Live desktop playback and OfflineAudioContext checks could not start in the build environment; see docs/VALIDATION.md for the exact validation limits.
+The Windows build passed all 16 native desktop checks, actual offline audio rendering, unit checks and backend persistence checks. The live song-catalogue query succeeded. See docs/VALIDATION.md for the exact scope and remaining limits.
 

@@ -8,6 +8,8 @@ Velvet is a local player first. Spotify, YouTube Music and SoundCloud are labell
 
 ## Download and use
 
+[Download Velvet for Windows](https://github.com/TheBabyKingdom/velvet-music/releases/tag/v1.0.0) · [Successful Windows checks](https://github.com/TheBabyKingdom/velvet-music/actions/runs/40504471427)
+
 The Windows download is **Velvet-1.0.0-Windows-x64.zip**, for 64-bit Windows 10/11. Extract **all** its contents into a folder, then open **Velvet.exe**. Keep the executable beside its included runtime files and resources. You do not need Node.js, a terminal, or administrator access.
 
 Try the three original Velvet Sessions instrumentals, then choose **Add music** to import files or a music folder. Open **Appearance** to change themes, colours and layout, or choose your own image, animated GIF or video wallpaper. GIFs retain their animation; video wallpapers loop silently.
@@ -63,7 +65,7 @@ Regenerate the bundled assets independently with:
 
 ## Verification status
 
-The core player and controls are implemented in the delivered source. Automated checks cover library imports, duplicate detection, persistent state, playlist formats, provider handling and audio parameter logic. The build host could not launch the native Electron test process, so live desktop playback, processed sound and visual behaviour remain unverified here. The included desktop test is intended to verify those behaviours on a Windows desktop that can run Electron.
+The Windows build passed all 16 native desktop checks, including actual playback and audio rendering, saved settings, playlists, queue restoration, image/GIF/video backgrounds and a live MusicBrainz search. Unit and backend checks also passed. See [validation details](docs/VALIDATION.md) for the exact scope. Physical listening across devices remains untested.
 
 ## GitHub and release builds
 
